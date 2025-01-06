@@ -133,31 +133,31 @@ router.put("/:id", async (req, res) => {
         WHERE id_pracownika = @id
       `);
 
-    // Usuń istniejące role
-    await new sql.Request(transaction)
-      .input("id", sql.Int, id)
-      .query(`
-        DELETE FROM dbo.Lekarz WHERE id_lekarza = @id;
-        DELETE FROM dbo.Recepcjonista WHERE id_pracownika = @id;
-      `);
+    // // Usuń istniejące role
+    // await new sql.Request(transaction)
+    //   .input("id", sql.Int, id)
+    //   .query(`
+    //     DELETE FROM dbo.Lekarz WHERE id_lekarza = @id;
+    //     DELETE FROM dbo.Recepcjonista WHERE id_pracownika = @id;
+    //   `);
 
-    // Dodaj nową rolę
-    if (rola === "Lekarz") {
-      await new sql.Request(transaction)
-        .input("id_lekarza", sql.Int, id)
-        .query(`
-          INSERT INTO dbo.Lekarz (id_lekarza)
-          VALUES (@id_lekarza)
-        `);
-    } else if (rola === "Recepcjonista") {
-      await new sql.Request(transaction)
-        .input("id_pracownika", sql.Int, id)
-        .input("wyksztalcenie", sql.NVarChar(100), wyksztalcenie)
-        .query(`
-          INSERT INTO dbo.Recepcjonista (id_pracownika, wyksztalcenie)
-          VALUES (@id_pracownika, @wyksztalcenie)
-        `);
-    }
+    // // Dodaj nową rolę
+    // if (rola === "Lekarz") {
+    //   await new sql.Request(transaction)
+    //     .input("id_lekarza", sql.Int, id)
+    //     .query(`
+    //       INSERT INTO dbo.Lekarz (id_lekarza)
+    //       VALUES (@id_lekarza)
+    //     `);
+    // } else if (rola === "Recepcjonista") {
+    //   await new sql.Request(transaction)
+    //     .input("id_pracownika", sql.Int, id)
+    //     .input("wyksztalcenie", sql.NVarChar(100), wyksztalcenie)
+    //     .query(`
+    //       INSERT INTO dbo.Recepcjonista (id_pracownika, wyksztalcenie)
+    //       VALUES (@id_pracownika, @wyksztalcenie)
+    //     `);
+    // }
 
     await transaction.commit();
     res.send("Zaktualizowano pracownika");
@@ -176,26 +176,55 @@ router.delete("/:id", async (req, res) => {
   try {
     await transaction.begin();
 
-    // Usuń powiązane rekordy z tabel Lekarz i Recepcjonista
-    await new sql.Request(transaction)
+    // Check if the employee is someone's boss
+    const bossCheckResult = await new sql.Request(transaction)
       .input("id", sql.Int, id)
       .query(`
-        DELETE FROM dbo.Lekarz WHERE id_lekarza = @id;
-        DELETE FROM dbo.Recepcjonista WHERE id_pracownika = @id;
+        SELECT COUNT(*) as count
+        FROM dbo.Pracownik
+        WHERE id_szef = @id
       `);
 
-    // Usuń pracownika
-    await new sql.Request(transaction)
+    if (bossCheckResult.recordset[0].count > 0) {
+      await transaction.rollback();
+      return res.status(400).json({ message: "Ten pracownik jest szefem innych pracowników. Najpierw zmień podwładnym szefa." });
+    }
+
+    // Check the employee's role
+    const roleCheckResult = await new sql.Request(transaction)
       .input("id", sql.Int, id)
       .query(`
-        DELETE FROM dbo.Pracownik WHERE id_pracownika = @id
+        SELECT 
+          CASE 
+            WHEN EXISTS (SELECT 1 FROM dbo.Lekarz WHERE id_lekarza = @id) THEN 'Lekarz'
+            WHEN EXISTS (SELECT 1 FROM dbo.Recepcjonista WHERE id_pracownika = @id) THEN 'Recepcjonista'
+            ELSE NULL
+          END AS rola
       `);
+
+    const role = roleCheckResult.recordset[0].rola;
+
+    // Delete from the role-specific table
+    if (role === 'Lekarz') {
+      await new sql.Request(transaction)
+        .input("id", sql.Int, id)
+        .query(`DELETE FROM dbo.Lekarz WHERE id_lekarza = @id`);
+    } else if (role === 'Recepcjonista') {
+      await new sql.Request(transaction)
+        .input("id", sql.Int, id)
+        .query(`DELETE FROM dbo.Recepcjonista WHERE id_pracownika = @id`);
+    }
+
+    // Delete from the Pracownik table
+    await new sql.Request(transaction)
+      .input("id", sql.Int, id)
+      .query(`DELETE FROM dbo.Pracownik WHERE id_pracownika = @id`);
 
     await transaction.commit();
-    res.send("Usunięto pracownika");
+    res.json({ message: "Pracownik został usunięty." });
   } catch (error) {
     await transaction.rollback();
-    res.status(500).send(error.message);
+    res.status(500).json({ message: error.message });
   }
 });
 

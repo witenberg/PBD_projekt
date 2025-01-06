@@ -205,6 +205,7 @@ async function deletePracownik(id) {
         return;
       }
 
+      alert("Pracownik został usunięty.");
       await loadPracownikTable();
     } catch (error) {
       console.error("Błąd usuwania:", error);

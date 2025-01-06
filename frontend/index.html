@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zarządzanie tabelami</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <ul>
+      <li><a href="#" data-table="Budynek">Budynek</a></li>
+      <li><a href="#" data-table="Gabinet">Gabinet</a></li>
+      <li><a href="#" data-table="Lekarz">Lekarz</a></li>
+      <li><a href="#" data-table="Pacjent">Pacjent</a></li>
+      <li><a href="#" data-table="Pracownik">Pracownik</a></li>
+      <li><a href="#" data-table="PracownikSzkolenie">Pracownik-Szkolenie</a></li>
+      <li><a href="#" data-table="Recepcjonista">Recepcjonista</a></li>
+      <li><a href="#" data-table="Specjalizacja">Specjalizacja</a></li>
+      <li><a href="#" data-table="Szkolenie">Szkolenie</a></li>
+      <li><a href="#" data-table="Wizyta">Wizyta</a></li>
+      <li><a href="#" data-table="Zabieg">Zabieg</a></li>
+      <li><a href="#" data-table="Zastepstwo">Zastępstwo</a></li>
+    </ul>
+  </nav>
+
+  <main id="content">
+    <h1>Wybierz tabelę z nawigacji</h1>
+  </main>
+
+  <script>
+    const API_URL = 'http://localhost:3000';
+    const navbarLinks = document.querySelectorAll("nav ul li a");
+    const content = document.getElementById("content");
+
+    navbarLinks.forEach(link => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        const tableName = link.dataset.table;
+
+        // Usuń wcześniej załadowany skrypt (jeśli istnieje)
+        const oldScript = document.getElementById("dynamicScript");
+        if (oldScript) {
+          oldScript.remove();
+        }
+
+        // Załaduj nowy skrypt
+        const script = document.createElement("script");
+        script.src = `${tableName}App.js`; // Plik app.js odpowiadający tabeli
+        script.id = "dynamicScript";
+        document.body.appendChild(script);
+
+        // Zmień zawartość główną
+        content.innerHTML = `<h1>Ładowanie tabeli: ${tableName}</h1>`;
+      });
+    });
+  </script>
+</body>
+</html>

@@ -11,6 +11,7 @@ async function initPracownikApp() {
           <th>Nazwisko</th>
           <th>Telefon</th>
           <th>Szef</th>
+          <th>Rola</th>
           <th>Akcje</th>
         </tr>
       </thead>
@@ -41,6 +42,7 @@ async function loadPracownikTable() {
           <td>${pracownik.nazwisko}</td>
           <td>${pracownik.telefon || "Brak"}</td>
           <td>${pracownik.szef || "Brak"}</td>
+          <td>${pracownik.rola || "Brak"}</td>
           <td>
             <button onclick="editPracownik(${pracownik.id_pracownika})">Edytuj</button>
             <button onclick="deletePracownik(${pracownik.id_pracownika})">Usuń</button>
@@ -81,6 +83,16 @@ async function showPracownikForm(pracownik = {}) {
         <option value="">Brak</option>
         ${szefOptions}
       </select>
+      <label>Rola:</label>
+      <select id="rola" onchange="toggleWyksztalcenie()" ${pracownik.id_pracownika ? 'disabled' : ''} required>
+        <option value="">Wybierz rolę</option>
+        <option value="Lekarz">Lekarz</option>
+        <option value="Recepcjonista">Recepcjonista</option>
+      </select>
+      <div id="wyksztalcenieContainer" style="display: none;">
+        <label>Wykształcenie:</label>
+        <input type="text" id="wyksztalcenie" ${pracownik.id_pracownika && pracownik.rola === "Recepcjonista" ? 'disabled' : ''} />
+      </div>
       <button type="submit">${pracownik.id_pracownika ? "Zapisz" : "Dodaj"}</button>
       <button type="button" onclick="hidePracownikForm()">Anuluj</button>
     </form>
@@ -88,11 +100,18 @@ async function showPracownikForm(pracownik = {}) {
 
   document.getElementById("pracownikFormInner").addEventListener("submit", async (event) => {
     event.preventDefault();
+    const roleSelect = document.getElementById("rola");
+    if (!pracownik.id_pracownika && !roleSelect.value) {
+      alert("Proszę wybrać rolę pracownika.");
+      return;
+    }
     const newData = {
       imie: document.getElementById("imie").value,
       nazwisko: document.getElementById("nazwisko").value,
       telefon: document.getElementById("telefon").value,
       id_szef: document.getElementById("id_szef").value || null,
+      rola: document.getElementById("rola").value,
+      wyksztalcenie: document.getElementById("wyksztalcenie").value || null,
     };
 
     if (pracownik.id_pracownika) {
@@ -104,6 +123,18 @@ async function showPracownikForm(pracownik = {}) {
     hidePracownikForm();
     await loadPracownikTable();
   });
+
+  if (pracownik.id_pracownika) {
+    document.getElementById("id_szef").value = pracownik.id_szef || "";
+    document.getElementById("rola").value = pracownik.rola || "";
+    document.getElementById("rola").disabled = true;
+    toggleWyksztalcenie();
+    if (pracownik.rola === "Recepcjonista") {
+      const wyksztalcenieInput = document.getElementById("wyksztalcenie");
+      wyksztalcenieInput.value = pracownik.wyksztalcenie || "";
+      wyksztalcenieInput.disabled = true;
+    }
+  }
 }
 
 // Ukrycie formularza
@@ -112,16 +143,28 @@ function hidePracownikForm() {
   formDiv.style.display = "none";
 }
 
+// Przełączanie pola wykształcenia
+function toggleWyksztalcenie() {
+  const rola = document.getElementById("rola").value;
+  const wyksztalcenieContainer = document.getElementById("wyksztalcenieContainer");
+  wyksztalcenieContainer.style.display = rola === "Recepcjonista" ? "block" : "none";
+}
+
 // Dodanie nowego pracownika
 async function addPracownik(data) {
   try {
-    await fetch(`${API_URL}/api/pracownik`, {
+    const response = await fetch(`${API_URL}/api/pracownik`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
   } catch (error) {
     console.error("Błąd dodawania:", error);
+    alert(error.message);
   }
 }
 
@@ -135,13 +178,18 @@ async function editPracownik(id) {
 // Aktualizacja pracownika
 async function updatePracownik(id, data) {
   try {
-    await fetch(`${API_URL}/api/pracownik/${id}`, {
+    const response = await fetch(`${API_URL}/api/pracownik/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message);
+    }
   } catch (error) {
     console.error("Błąd aktualizacji:", error);
+    alert(error.message);
   }
 }
 
@@ -165,5 +213,5 @@ async function deletePracownik(id) {
   }
 }
 
-
 initPracownikApp();
+

@@ -12,6 +12,7 @@ const specjalizacjaRoutes = require("./specjalizacjaRoutes");
 const wizytaRoutes = require("./wizytaRoutes");
 const zabiegRoutes = require("./zabiegRoutes");
 const zastepstwoRoutes = require("./zastepstwoRoutes");
+const umowWizyteRoutes = require("./umowWizyteRoutes");
 const cors = require('cors');
 
 const app = express();
@@ -32,6 +33,7 @@ app.use("/api/specjalizacja", specjalizacjaRoutes);
 app.use("/api/wizyta", wizytaRoutes);
 app.use("/api/zabieg", zabiegRoutes);
 app.use("/api/zastepstwo", zastepstwoRoutes);
+app.use("/api/umow-wizyte", umowWizyteRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

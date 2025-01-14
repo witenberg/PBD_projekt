@@ -183,7 +183,7 @@ async function initWizytaApp() {
       gabinetSelect.disabled = false;
     } catch (error) {
       console.error("Błąd ładowania gabinetów:", error);
-      gabinetSelect.innerHTML = '<option value="">Błąd ładowania gabinetów</option>';
+      gabinetSelect.innerHTML = '<option value="">Brak gabinetów w tym budynku</option>';
     }
   }
   

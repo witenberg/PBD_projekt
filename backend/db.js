@@ -2,12 +2,12 @@ const sql = require("mssql");
 
 // Konfiguracja połączenia z bazą danych
 const config = {
-  user: "myuser", // Zmien na odpowiednie dane
+  user: "myuser",
   password: "mypassword",
   server: "localhost",
   database: "Przychodnia",
   options: {
-    encrypt: true, // Używane w przypadku Azure
+    encrypt: true,
     trustServerCertificate: true,
   },
 };

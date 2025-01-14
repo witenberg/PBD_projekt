@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
       JOIN dbo.Budynek b ON w.budynek = b.symbol
       JOIN dbo.Lekarz l ON w.id_lekarza = l.id_lekarza
       JOIN dbo.Pracownik pr ON l.id_lekarza = pr.id_pracownika
-      ORDER BY w.data DESC
+      ORDER BY w.data ASC
     `);
     res.json(result.recordset);
   } catch (error) {
@@ -153,6 +153,8 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   const { id_pacjenta, numer_gabinetu, budynek, id_lekarza, data, koszt } = req.body;
   try {
+    const utcDate = new Date(data).toISOString();
+    console.log(utcDate);
     const pool = await poolPromise;
     const result = await pool
       .request()
@@ -160,18 +162,20 @@ router.post("/", async (req, res) => {
       .input("numer_gabinetu", sql.Int, numer_gabinetu)
       .input("budynek", sql.NVarChar(10), budynek)
       .input("id_lekarza", sql.Int, id_lekarza)
-      .input("data", sql.DateTime, new Date(data))
+      .input("data", sql.DateTime, utcDate)
       .input("koszt", sql.Decimal(10, 2), koszt)
       .query(`
         INSERT INTO dbo.Wizyta (id_pacjenta, numer_gabinetu, budynek, id_lekarza, data, koszt)
         OUTPUT INSERTED.id_wizyty
         VALUES (@id_pacjenta, @numer_gabinetu, @budynek, @id_lekarza, @data, @koszt)
       `);
+
     res.status(201).json({ id_wizyty: result.recordset[0].id_wizyty, message: "Dodano nową wizytę" });
   } catch (error) {
     res.status(500).send(error.message);
   }
 });
+
 
 // Aktualizuj wizytę
 router.put("/:id", async (req, res) => {

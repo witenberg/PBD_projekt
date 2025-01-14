@@ -25,7 +25,7 @@ async function initSzkolenieApp() {
 // Załadowanie danych do tabeli
 async function loadSzkolenieTable() {
   const tableBody = document.querySelector("#szkolenieTable tbody");
-  tableBody.innerHTML = ""; // Wyczyść tabelę
+  tableBody.innerHTML = ""; 
 
   try {
     const response = await fetch(`${API_URL}/api/szkolenie`);

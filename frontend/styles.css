@@ -13,39 +13,82 @@ body {
   padding: 20px;
 }
 
-/* Stylowanie nawigacji */
 nav {
-  background-color: #333;
-  padding: 10px 0;
+  display: none;
+  padding: 1rem;
+  background-color: #c9c9c9;
 }
-
+#loginForm {
+  padding: 1rem;
+  background-color: #c9c9c9;
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+  margin: 0 auto;
+}
+#loginForm input, #loginForm button {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+}
+.admin-section, .client-section {
+  flex: 1;
+}
+.admin-section h2, .client-section h2 {
+  margin-bottom: 0.5rem;
+}
 nav ul {
   list-style-type: none;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+  padding: 0;
 }
-
-nav li {
-  padding: 5px 10px;
+nav ul li {
+  margin-bottom: 0.5rem;
 }
-
-nav a {
+nav ul li a {
   text-decoration: none;
-  color: white;
-  font-size: 16px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  color: #333;
 }
-
-nav a:hover {
-  background-color: #555;
-  color: #ffcc00;
+nav ul li a:hover {
+  text-decoration: underline;
 }
-
-nav a.active {
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+.dropdown-btn {
   background-color: #007BFF;
   color: white;
-  font-weight: bold;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+.dropdown:hover .dropdown-btn {
+  background-color: #005cbd;
+}
+#logoutBtn {
+  position: absolute;
+  right: 2rem;
+  top: 1.5rem;
 }
 
 /* Stylowanie treści głównej */

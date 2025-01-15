@@ -1,60 +1,123 @@
 <!DOCTYPE html>
 <html lang="pl">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zarządzanie tabelami</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
+  <div id="loginForm">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+  </div>
+
   <nav>
-    <ul>
-      <li><a href="#" data-table="Budynek">Budynek</a></li>
-      <li><a href="#" data-table="Gabinet">Gabinet</a></li>
-      <li><a href="#" data-table="Lekarz">Lekarz</a></li>
-      <li><a href="#" data-table="Pacjent">Pacjent</a></li>
-      <li><a href="#" data-table="Pracownik">Pracownik</a></li>
-      <li><a href="#" data-table="PracownikSzkolenie">Pracownik-Szkolenie</a></li>
-      <li><a href="#" data-table="Recepcjonista">Recepcjonista</a></li>
-      <li><a href="#" data-table="Specjalizacja">Specjalizacja</a></li>
-      <li><a href="#" data-table="Szkolenie">Szkolenie</a></li>
-      <li><a href="#" data-table="Wizyta">Wizyta</a></li>
-      <li><a href="#" data-table="Zabieg">Zabieg</a></li>
-      <li><a href="#" data-table="Zastepstwo">Zastępstwo</a></li>
-      <li><a href="#" data-table="UmowWizyte">Umow wizyte</a></li>
-    </ul>
+    <div class="admin-section">
+      <h2>Zarządzanie tabelami</h2>
+      <div class="dropdown">
+        <button class="dropdown-btn">Wybierz tabelę</button>
+        <div class="dropdown-content">
+          <a href="#" data-table="Budynek">Budynek</a>
+          <a href="#" data-table="Gabinet">Gabinet</a>
+          <a href="#" data-table="Lekarz">Lekarz</a>
+          <a href="#" data-table="Pacjent">Pacjent</a>
+          <a href="#" data-table="Pracownik">Pracownik</a>
+          <a href="#" data-table="PracownikSzkolenie">Pracownik-Szkolenie</a>
+          <a href="#" data-table="Recepcjonista">Recepcjonista</a>
+          <a href="#" data-table="Specjalizacja">Specjalizacja</a>
+          <a href="#" data-table="Szkolenie">Szkolenie</a>
+          <a href="#" data-table="Wizyta">Wizyta</a>
+          <a href="#" data-table="Zabieg">Zabieg</a>
+          <a href="#" data-table="Zastepstwo">Zastępstwo</a>
+        </div>
+      </div>
+    </div>
+    <div class="client-section" style="display: none;">
+      <h2>Dla klientów</h2>
+      <ul>
+        <li><a href="#" data-table="UmowWizyte">Umów wizytę</a></li>
+      </ul>
+    </div>
+    <button id="logoutBtn" style="display: none;">Wyloguj</button>
   </nav>
 
   <main id="content">
-    <h1>Wybierz tabelę z nawigacji</h1>
+    <h1>Zaloguj się, aby uzyskać dostęp</h1>
   </main>
 
   <script>
     const API_URL = 'http://localhost:3000';
-    const navbarLinks = document.querySelectorAll("nav ul li a");
+    const navbarLinks = document.querySelectorAll("nav a");
     const content = document.getElementById("content");
+    const loginForm = document.getElementById("loginForm");
+    const nav = document.querySelector("nav");
+    const clientSection = document.querySelector(".client-section");
+
+    // Simplified user data (replace with proper authentication in a real application)
+    const users = {
+      "root@ex.com": { password: "root", role: "admin" },
+      "user@ex.com": { password: "user", role: "user" }
+    };
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      if (users[email] && users[email].password === password) {
+        loginForm.style.display = "none";
+        nav.style.display = "block";
+        content.innerHTML = "<h1>Wybierz tabelę z nawigacji</h1>";
+        document.getElementById("logoutBtn").style.display = "block";
+
+        if (users[email].role === "user") {
+          document.querySelector(".admin-section").style.display = "none";
+          clientSection.style.display = "block";
+        } else {
+          clientSection.style.display = "none";
+        }
+      } else {
+        alert("Nieprawidłowy email lub hasło");
+      }
+    }
 
     navbarLinks.forEach(link => {
       link.addEventListener("click", (event) => {
         event.preventDefault();
         const tableName = link.dataset.table;
 
-        // Usuń wcześniej załadowany skrypt (jeśli istnieje)
+        // usunięcie poprzedniego skryptu, jeśli istnieje
         const oldScript = document.getElementById("dynamicScript");
         if (oldScript) {
           oldScript.remove();
         }
 
-        // Załaduj nowy skrypt
+        // załadowanie nowego skryptu, zgodnie ze schematem
         const script = document.createElement("script");
         script.src = `${tableName}App.js`; // Plik app.js odpowiadający tabeli
         script.id = "dynamicScript";
         document.body.appendChild(script);
 
-        // Zmień zawartość główną
+        // zmiana głównej zawartości
         content.innerHTML = `<h1>Ładowanie tabeli: ${tableName}</h1>`;
       });
     });
+
+    function logout() {
+      loginForm.style.display = "flex";
+      nav.style.display = "none";
+      document.getElementById("logoutBtn").style.display = "none";
+      content.innerHTML = "<h1>Zaloguj się, aby uzyskać dostęp</h1>";
+      document.getElementById("email").value = "";
+      document.getElementById("password").value = "";
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", logout);
   </script>
 </body>
+
 </html>

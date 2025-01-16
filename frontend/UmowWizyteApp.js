@@ -221,7 +221,5 @@ async function bookAppointment(doctorId, date, roomNumber, buildingSymbol) {
   }
 }
 
-let globalGroupedDates;
-
 initUmowWizyteApp();
 

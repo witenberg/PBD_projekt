@@ -52,13 +52,13 @@
 
   <script>
     const API_URL = 'http://localhost:3000';
+    let globalGroupedDates;
     const navbarLinks = document.querySelectorAll("nav a");
     const content = document.getElementById("content");
     const loginForm = document.getElementById("loginForm");
     const nav = document.querySelector("nav");
     const clientSection = document.querySelector(".client-section");
 
-    // Simplified user data (replace with proper authentication in a real application)
     const users = {
       "root@ex.com": { password: "root", role: "admin" },
       "user@ex.com": { password: "user", role: "user" }

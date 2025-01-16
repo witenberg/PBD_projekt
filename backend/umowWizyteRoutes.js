@@ -72,7 +72,6 @@ router.get('/dostepne-terminy/:id_lekarza', async (req, res) => {
 // Pobierz dostępne gabinety
 router.post('/dostepne-gabinety', async (req, res) => {
   const { doctorId, date } = req.body;
-  console.log(date);
   try {
     const pool = await poolPromise;
     const result = await pool.request()
@@ -102,8 +101,6 @@ router.post('/', async (req, res) => {
   const pool = await poolPromise;
   const transaction = new sql.Transaction(pool);
 
-  console.log('Dane wejściowe:', req.body);
-
   try {
     await transaction.begin();
 
@@ -123,7 +120,6 @@ router.post('/', async (req, res) => {
 
     let patientId;
     if (patientResult.recordset.length === 0) {
-      // Dodaj nowego pacjenta
       try {
         const newPatientResult = await new sql.Request(transaction)
           .input('imie', sql.NVarChar(50), imie)

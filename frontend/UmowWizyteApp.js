@@ -80,27 +80,25 @@ function displayCalendar(groupedDates, doctorId, weekOffset) {
   }
 
   const weekDates = groupedDates[currentWeek];
-  const hours = Array.from({length: 10}, (_, i) => i + 8); // Hours from 8 to 17
+  const hours = Array.from({length: 10}, (_, i) => i + 8);
 
   const table = document.createElement("table");
   table.style.borderCollapse = "collapse";
 
-  // Create header row with dates
   const headerRow = document.createElement("tr");
   headerRow.innerHTML = "<th>Godzina</th>";
-  for (let i = 1; i < 7; i++) { // Start from Monday (i = 1)
+  for (let i = 1; i < 7; i++) {
     const date = new Date(currentWeek);
     date.setDate(date.getDate() + i);
     headerRow.innerHTML += `<th>${date.toLocaleDateString('pl-PL', { weekday: 'short', month: 'numeric', day: 'numeric' })}</th>`;
   }
   table.appendChild(headerRow);
 
-  // Create rows for each hour
   hours.forEach(hour => {
     const row = document.createElement("tr");
     row.innerHTML = `<td>${hour}:00</td>`;
 
-    for (let i = 1; i < 7; i++) { // Start from Monday (i = 1)
+    for (let i = 1; i < 7; i++) {
       const date = new Date(currentWeek);
       date.setDate(date.getDate() + i);
       const cellTime = new Date(date.setHours(hour, 0, 0, 0));
@@ -126,7 +124,6 @@ function displayCalendar(groupedDates, doctorId, weekOffset) {
   calendar.appendChild(table);
 }
 
-// Wybór daty i wyświetlenie dostępnych gabinetów
 // Wybór daty i wyświetlenie dostępnych gabinetów
 async function selectDate(doctorId, date) {
   try {

@@ -20,21 +20,18 @@ async function initWizytaApp() {
       </table>
       <div id="wizytaForm" style="display: none;"></div>
     `;
-  
     document.getElementById("addWizytaBtn").addEventListener("click", () => showWizytaForm());
-  
     await loadWizytaTable();
   }
   
   // Załadowanie danych do tabeli
   async function loadWizytaTable() {
     const tableBody = document.querySelector("#wizytaTable tbody");
-    tableBody.innerHTML = ""; // Wyczyść tabelę
+    tableBody.innerHTML = "";
   
     try {
       const response = await fetch(`${API_URL}/api/wizyta`);
       const data = await response.json();
-      console.log(data);
   
       data.forEach((wizyta) => {
         const row = `
@@ -98,7 +95,7 @@ async function initWizytaApp() {
     const budynkiOptions = budynki
       .map((b) => `<option value="${b.symbol}" ${wizyta && wizyta.budynek == b.symbol ? 'selected' : ''}>${b.nazwa}</option>`)
       .join("");
-  
+   
     formDiv.innerHTML = `
       <h2>${wizyta ? "Edytuj" : "Dodaj"} Wizytę</h2>
       <form id="wizytaFormInner">

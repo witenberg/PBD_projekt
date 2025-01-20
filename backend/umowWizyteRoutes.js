@@ -103,8 +103,6 @@ router.post('/', async (req, res) => {
 
   try {
     await transaction.begin();
-
-    // Sprawdź, czy pacjent istnieje
     let patientResult;
     try {
       patientResult = await new sql.Request(transaction)
@@ -144,7 +142,7 @@ router.post('/', async (req, res) => {
         .input('numer_gabinetu', sql.Int, roomNumber)
         .input('budynek', sql.NVarChar(10), building)
         .input('id_lekarza', sql.Int, doctorId)
-        .input('data', sql.DateTime, new Date(date)) // Upewnij się, że data jest w odpowiednim formacie
+        .input('data', sql.DateTime, new Date(date))
         .input('koszt', sql.Decimal(10, 2), 200.00)
         .query(`
           INSERT INTO Wizyta (id_pacjenta, numer_gabinetu, budynek, id_lekarza, data, koszt)

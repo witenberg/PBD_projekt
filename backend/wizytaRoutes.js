@@ -154,7 +154,6 @@ router.post("/", async (req, res) => {
   const { id_pacjenta, numer_gabinetu, budynek, id_lekarza, data, koszt } = req.body;
   try {
     const utcDate = new Date(data).toISOString();
-    console.log(utcDate);
     const pool = await poolPromise;
     const result = await pool
       .request()
